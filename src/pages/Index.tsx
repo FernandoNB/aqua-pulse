@@ -1,4 +1,12 @@
 import { useState, useEffect } from 'react';
+import { 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  User as FirebaseUser 
+} from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import AuthForm from '@/components/AuthForm';
 import Dashboard from '@/components/Dashboard';
 import { useToast } from '@/hooks/use-toast';
@@ -12,39 +20,76 @@ const Index = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState('');
   const { toast } = useToast();
 
-  // Mock authentication functions (replace with real Supabase integration)
+  // Real Firebase authentication functions
   const handleAuth = async (email: string, password: string) => {
     setLoading(true);
     setError('');
 
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mock authentication logic
-      if (email && password.length >= 6) {
-        const mockUser = {
-          id: `user_${Date.now()}`,
-          email: email
-        };
-        
-        setUser(mockUser);
-        
-        toast({
-          title: isLogin ? "Login realizado com sucesso!" : "Conta criada com sucesso!",
-          description: `Bem-vindo, ${email}`,
-        });
+      let userCredential;
+      
+      if (isLogin) {
+        // Login
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
       } else {
-        throw new Error('Email e senha são obrigatórios. A senha deve ter pelo menos 6 caracteres.');
+        // Register
+        userCredential = await createUserWithEmailAndPassword(auth, email, password);
       }
+
+      const firebaseUser = userCredential.user;
+      const userData: User = {
+        id: firebaseUser.uid,
+        email: firebaseUser.email || email
+      };
+      
+      setUser(userData);
+      
+      toast({
+        title: isLogin ? "Login realizado com sucesso!" : "Conta criada com sucesso!",
+        description: `Bem-vindo, ${firebaseUser.email}`,
+      });
+
     } catch (err: any) {
-      setError(err.message || 'Erro durante a autenticação');
+      let errorMessage = 'Erro durante a autenticação';
+      
+      // Firebase error messages in Portuguese
+      switch (err.code) {
+        case 'auth/user-not-found':
+          errorMessage = 'Usuário não encontrado';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Senha incorreta';
+          break;
+        case 'auth/email-already-in-use':
+          errorMessage = 'Este email já está em uso';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'A senha deve ter pelo menos 6 caracteres';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Email inválido';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Muitas tentativas. Tente novamente mais tarde';
+          break;
+        case 'auth/network-request-failed':
+          errorMessage = 'Erro de conexão. Verifique sua internet';
+          break;
+        case 'auth/configuration-not-found':
+          errorMessage = 'Firebase não configurado. Configure suas credenciais no arquivo firebase.ts';
+          break;
+        default:
+          errorMessage = err.message || 'Erro durante a autenticação';
+      }
+      
+      setError(errorMessage);
       toast({
         title: "Erro na autenticação",
-        description: err.message || 'Erro durante a autenticação',
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -54,7 +99,7 @@ const Index = () => {
 
   const handleLogout = async () => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await signOut(auth);
       setUser(null);
       toast({
         title: "Logout realizado",
@@ -69,27 +114,37 @@ const Index = () => {
     }
   };
 
-  // Check for existing session on mount
+  // Listen for authentication state changes
   useEffect(() => {
-    // In a real app, this would check for existing Supabase session
-    const savedUser = localStorage.getItem('aqua-pulse-user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (err) {
-        localStorage.removeItem('aqua-pulse-user');
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        const userData: User = {
+          id: firebaseUser.uid,
+          email: firebaseUser.email || ''
+        };
+        setUser(userData);
+      } else {
+        setUser(null);
       }
-    }
+      setInitialLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  // Save user to localStorage when user state changes
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('aqua-pulse-user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('aqua-pulse-user');
-    }
-  }, [user]);
+  // Show loading spinner while checking authentication
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-surface">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-ocean rounded-full flex items-center justify-center shadow-lg animate-float mx-auto mb-4">
+            <span className="text-2xl">💧</span>
+          </div>
+          <p className="text-muted-foreground">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (user) {
     return <Dashboard user={user} onLogout={handleLogout} />;

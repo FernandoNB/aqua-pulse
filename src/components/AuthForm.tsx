@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import FirebaseConfigInfo from './FirebaseConfigInfo';
 import { cn } from '@/lib/utils';
 
 interface AuthFormProps {
@@ -23,14 +24,17 @@ const AuthForm = ({ isLogin, onToggleMode, onSubmit, error, loading }: AuthFormP
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-surface">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-surface">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-primary/5 rounded-full animate-float" />
         <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-accent/5 rounded-full animate-float" style={{ animationDelay: '1s' }} />
       </div>
 
-      <Card className="w-full max-w-md shadow-2xl border-0 bg-card/80 backdrop-blur-sm relative z-10">
+      <div className="w-full max-w-md space-y-6 relative z-10">
+        <FirebaseConfigInfo />
+        
+        <Card className="shadow-2xl border-0 bg-card/80 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4">
           {/* Logo/Icon */}
           <div className="mx-auto w-16 h-16 bg-gradient-ocean rounded-full flex items-center justify-center shadow-lg animate-float">
@@ -111,6 +115,7 @@ const AuthForm = ({ isLogin, onToggleMode, onSubmit, error, loading }: AuthFormP
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
