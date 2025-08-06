@@ -137,8 +137,8 @@ const Index = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-surface">
         <div className="text-center">
-          <div className="w-16 h-16 bg-gradient-ocean rounded-full flex items-center justify-center shadow-lg animate-float mx-auto mb-4">
-            <span className="text-2xl">💧</span>
+          <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center shadow-lg mx-auto mb-4">
+            <div className="w-8 h-8 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin"></div>
           </div>
           <p className="text-muted-foreground">Carregando...</p>
         </div>

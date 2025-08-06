@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import FirebaseConfigInfo from './FirebaseConfigInfo';
 import { cn } from '@/lib/utils';
 
 interface AuthFormProps {
@@ -32,16 +31,9 @@ const AuthForm = ({ isLogin, onToggleMode, onSubmit, error, loading }: AuthFormP
       </div>
 
       <div className="w-full max-w-md space-y-6 relative z-10">
-        <FirebaseConfigInfo />
-        
         <Card className="shadow-2xl border-0 bg-card/80 backdrop-blur-sm">
         <CardHeader className="text-center space-y-4">
-          {/* Logo/Icon */}
-          <div className="mx-auto w-16 h-16 bg-gradient-ocean rounded-full flex items-center justify-center shadow-lg animate-float">
-            <span className="text-2xl">💧</span>
-          </div>
-          
-          <CardTitle className="text-2xl font-bold bg-gradient-ocean bg-clip-text text-transparent">
+          <CardTitle className="text-2xl font-bold text-foreground">
             {isLogin ? 'Bem-vindo de volta' : 'Criar conta'}
           </CardTitle>
           
