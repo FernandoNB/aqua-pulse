@@ -50,7 +50,7 @@ const Index = () => {
       
       toast({
         title: isLogin ? "Login realizado com sucesso!" : "Conta criada com sucesso!",
-        description: `Bem-vindo, ${firebaseUser.email}`,
+        description: `Bem-vindo ao VistaData, ${firebaseUser.email}`,
       });
 
     } catch (err: any) {

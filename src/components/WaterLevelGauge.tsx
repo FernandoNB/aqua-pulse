@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { Droplets, TrendingUp, Clock } from 'lucide-react';
 
 interface WaterLevelGaugeProps {
   level: number;
@@ -8,106 +8,133 @@ interface WaterLevelGaugeProps {
 }
 
 const WaterLevelGauge = ({ level, lastUpdated, className }: WaterLevelGaugeProps) => {
-  const waterColor = useMemo(() => {
-    if (level < 25) return 'water-low';
-    if (level < 50) return 'water-medium';
-    if (level < 75) return 'water-high';
-    return 'water-full';
-  }, [level]);
+  const getStatusColor = (level: number) => {
+    if (level < 25) return 'text-data-error';
+    if (level < 50) return 'text-data-warning';
+    if (level < 75) return 'text-data-primary';
+    return 'text-data-success';
+  };
 
-  const ripples = Array.from({ length: 3 }, (_, i) => i);
+  const getStatusLabel = (level: number) => {
+    if (level < 25) return 'Crítico';
+    if (level < 50) return 'Baixo';
+    if (level < 75) return 'Normal';
+    return 'Ótimo';
+  };
+
+  const getBgGradient = (level: number) => {
+    if (level < 25) return 'from-data-error/20 to-data-error/10';
+    if (level < 50) return 'from-data-warning/20 to-data-warning/10';
+    if (level < 75) return 'from-data-primary/20 to-data-primary/10';
+    return 'from-data-success/20 to-data-success/10';
+  };
 
   return (
-    <div className={cn("relative w-full max-w-md mx-auto", className)}>
-      {/* Water Tank Container */}
-      <div className="relative h-80 bg-card border-2 border-border rounded-xl overflow-hidden shadow-lg">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-surface opacity-50" />
-        
-        {/* Water Level */}
-        <div 
-          className="absolute bottom-0 left-0 w-full transition-all duration-1000 ease-out animate-water-flow bg-gradient-water"
-          style={{ 
-            height: `${Math.max(level, 0)}%`,
-            background: level < 25 ? 'hsl(var(--water-low))' :
-                       level < 50 ? 'hsl(var(--water-medium))' :
-                       level < 75 ? 'hsl(var(--water-high))' :
-                       'hsl(var(--water-full))'
-          }}
-        >
-          {/* Water surface ripples */}
-          <div className="absolute top-0 left-0 w-full h-2 overflow-hidden">
-            {ripples.map((_, index) => (
-              <div
-                key={index}
-                className="absolute top-0 w-8 h-8 rounded-full border-2 border-white/30 animate-ripple"
-                style={{
-                  left: `${20 + index * 30}%`,
-                  animationDelay: `${index * 0.5}s`,
-                  animationDuration: '2s'
-                }}
-              />
-            ))}
+    <div className={cn("w-full max-w-md mx-auto", className)}>
+      <div className="space-y-6">
+        {/* Modern Tank Visualization */}
+        <div className="relative">
+          <div className="water-tank h-64 w-32 mx-auto bg-gradient-to-b from-muted/30 to-muted">
+            {/* Water fill with modern gradient */}
+            <div 
+              className="water-fill bg-gradient-water rounded-b-lg"
+              style={{ height: `${level}%` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-data-primary/30 to-transparent animate-water-flow" />
+            </div>
+            
+            {/* Tank indicators */}
+            <div className="absolute inset-y-0 -right-8 flex flex-col justify-between text-xs text-muted-foreground py-2">
+              <span>100%</span>
+              <span>75%</span>
+              <span>50%</span>
+              <span>25%</span>
+              <span>0%</span>
+            </div>
+            
+            {/* Current level indicator */}
+            <div 
+              className="absolute -left-4 w-6 h-0.5 bg-primary shadow-gold transform -translate-y-1/2"
+              style={{ top: `${100 - level}%` }}
+            >
+              <div className="absolute -left-8 -top-2 text-xs font-medium text-primary">
+                {level}%
+              </div>
+            </div>
           </div>
-          
-          {/* Water level percentage display */}
-          {level > 15 && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-white text-2xl font-bold drop-shadow-lg">
-                {Math.round(level)}%
+        </div>
+
+        {/* Status and Metrics */}
+        <div className="space-y-4">
+          {/* Current Status */}
+          <div className={cn("text-center p-4 rounded-lg bg-gradient-to-r", getBgGradient(level))}>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Droplets className={cn("w-5 h-5", getStatusColor(level))} />
+              <span className={cn("font-semibold", getStatusColor(level))}>
+                Status: {getStatusLabel(level)}
               </span>
+            </div>
+            <div className="text-2xl font-bold text-foreground">
+              {level}% de capacidade
+            </div>
+          </div>
+
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-3 rounded-lg bg-muted/50">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <span className="text-xs text-muted-foreground">Tendência</span>
+              </div>
+              <div className="font-medium text-sm text-primary">
+                {level > 50 ? '↗ Subindo' : '↘ Descendo'}
+              </div>
+            </div>
+
+            <div className="text-center p-3 rounded-lg bg-muted/50">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Clock className="w-4 h-4 text-primary" />
+                <span className="text-xs text-muted-foreground">Última</span>
+              </div>
+              <div className="font-medium text-sm">
+                {lastUpdated ? (
+                  <span>
+                    {lastUpdated.toLocaleTimeString('pt-BR', { 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">--:--</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar Alternative */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Capacidade</span>
+              <span className="font-medium">{level}%</span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-water transition-all duration-1000 ease-out rounded-full"
+                style={{ width: `${level}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Vazio</span>
+              <span>Cheio</span>
+            </div>
+          </div>
+
+          {/* Last Update Info */}
+          {lastUpdated && (
+            <div className="text-center text-xs text-muted-foreground bg-muted/30 p-2 rounded">
+              Última atualização: {lastUpdated.toLocaleString('pt-BR')}
             </div>
           )}
-        </div>
-
-        {/* Level indicators */}
-        <div className="absolute right-2 top-2 bottom-2 w-1 bg-border/50 rounded-full">
-          {[100, 75, 50, 25].map((mark) => (
-            <div
-              key={mark}
-              className="absolute right-0 w-3 h-0.5 bg-muted-foreground/50"
-              style={{ bottom: `${mark}%` }}
-            >
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
-                {mark}%
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Empty state indicator */}
-        {level <= 0 && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <div className="text-4xl mb-2">💧</div>
-              <span className="text-muted-foreground">Tank vazio</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Status Info */}
-      <div className="mt-4 text-center space-y-2">
-        <div className="text-2xl font-bold text-foreground">
-          Nível: {Math.round(level)}%
-        </div>
-        
-        {lastUpdated && (
-          <p className="text-sm text-muted-foreground">
-            Última atualização: {lastUpdated.toLocaleString('pt-BR')}
-          </p>
-        )}
-        
-        {/* Status badge */}
-        <div className={cn(
-          "inline-flex items-center px-3 py-1 rounded-full text-xs font-medium",
-          level < 25 && "bg-destructive/10 text-destructive",
-          level >= 25 && level < 75 && "bg-yellow-500/10 text-yellow-600",
-          level >= 75 && "bg-green-500/10 text-green-600"
-        )}>
-          {level < 25 && "⚠️ Nível Baixo"}
-          {level >= 25 && level < 75 && "✓ Nível Normal"}
-          {level >= 75 && "✅ Nível Alto"}
         </div>
       </div>
     </div>

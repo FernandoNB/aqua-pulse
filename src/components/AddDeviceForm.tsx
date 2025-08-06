@@ -91,7 +91,7 @@ const AddDeviceForm = ({ userId, onDeviceAdded }: AddDeviceFormProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ocean" size="lg">
+        <Button variant="vista" size="lg">
           📱 Adicionar Novo Sensor
         </Button>
       </DialogTrigger>
@@ -182,7 +182,7 @@ const AddDeviceForm = ({ userId, onDeviceAdded }: AddDeviceFormProps) => {
             </Button>
             <Button 
               type="submit" 
-              variant="water"
+              variant="professional"
               disabled={loading}
               className="flex-1"
             >

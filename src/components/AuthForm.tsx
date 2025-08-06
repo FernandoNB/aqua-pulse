@@ -39,8 +39,8 @@ const AuthForm = ({ isLogin, onToggleMode, onSubmit, error, loading }: AuthFormP
           
           <CardDescription className="text-muted-foreground">
             {isLogin 
-              ? 'Acesse seu painel de monitoramento de água'
-              : 'Cadastre-se para monitorar seus níveis de água'
+              ? 'Acesse seu painel de monitorização de dados'
+              : 'Cadastre-se para monitorizar seus dados em tempo real'
             }
           </CardDescription>
         </CardHeader>
@@ -85,9 +85,9 @@ const AuthForm = ({ isLogin, onToggleMode, onSubmit, error, loading }: AuthFormP
 
             <Button 
               type="submit" 
-              variant="ocean"
+              variant="vista"
               size="lg"
-              className="w-full"
+              className="w-full font-medium"
               disabled={loading}
             >
               {loading ? 'Processando...' : (isLogin ? 'Entrar' : 'Criar conta')}
