@@ -43,6 +43,9 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
               <Badge variant="outline" className="border-primary text-primary">
                 {user.email}
               </Badge>
+              <Badge variant="outline" className="border-border text-muted-foreground">
+                UID: {user.id}
+              </Badge>
               <Button 
                 variant="professional" 
                 size="sm" 

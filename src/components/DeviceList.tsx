@@ -133,11 +133,11 @@ const DeviceList = ({ userId, onDeviceSelect, selectedDeviceId }: DeviceListProp
   }
 
   return (
-    <div className="space-y-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {devices.map((device) => (
         <Card 
           key={device.id}
-          className={`cursor-pointer transition-all hover:shadow-lg ${
+          className={`h-full cursor-pointer transition-all hover:shadow-lg ${
             selectedDeviceId === device.id 
               ? 'ring-2 ring-primary bg-primary/5' 
               : 'hover:bg-accent/50'
